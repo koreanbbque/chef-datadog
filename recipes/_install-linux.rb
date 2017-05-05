@@ -23,7 +23,7 @@ include_recipe 'datadog::repository' if node['datadog']['installrepo']
 dd_agent_version =
   if node['datadog']['agent_version'].respond_to?(:each_pair)
     case node['platform_family']
-    when 'rhel', 'fedora'
+    when 'rhel', 'fedora', 'amazon'
       node['datadog']['agent_version']['rhel']
     else
       node['datadog']['agent_version'][node['platform_family']]
@@ -45,7 +45,7 @@ else
   # default behavior, remove the `base` package as it is no longer needed
   package 'datadog-agent-base' do
     action :remove
-    only_if 'rpm -q datadog-agent-base' if %w(rhel fedora).include?(node['platform_family'])
+    only_if 'rpm -q datadog-agent-base' if %w(rhel fedora amazon).include?(node['platform_family'])
     not_if 'apt-cache policy datadog-agent-base | grep "Installed: (none)"' if node['platform_family'] == 'debian'
   end
   package_retries = node['datadog']['agent_package_retries']
